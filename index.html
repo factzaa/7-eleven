@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#00703c">
 <title>7-Eleven · ลงเวลาเข้างาน</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,79 +12,78 @@
 <style>
   :root{
     --green:#00703c; --green-d:#00582f; --green-soft:#e7f3ec;
-    --orange:#f5821f; --orange-soft:#fdeede;
-    --red:#e11f26; --red-soft:#fdeaea;
+    --orange:#f5821f; --red:#e11f26; --red-soft:#fdeaea;
     --bg:#eceee9; --card:#ffffff; --line:#e3e6e1; --line2:#cfd3cc;
     --txt:#1b1f1c; --muted:#737a73; --mono:'IBM Plex Mono',monospace;
   }
   *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
   body{font-family:'Anuphan',sans-serif; background:var(--bg); color:var(--txt);
-       min-height:100dvh; display:flex; justify-content:center;}
-  .app{width:100%; max-width:460px; background:var(--card); min-height:100dvh; display:flex; flex-direction:column;
-       box-shadow:0 0 40px rgba(0,0,0,.06);}
-  .stripe{height:6px; display:flex;}
+       display:flex; justify-content:center; overflow:hidden;}
+  .app{width:100%; max-width:460px; height:100dvh; background:var(--card);
+       display:flex; flex-direction:column; box-shadow:0 0 40px rgba(0,0,0,.06); position:relative;}
+  .stripe{height:6px; display:flex; flex:none;}
   .stripe i{flex:1; display:block;}
   .stripe .g{background:var(--green);} .stripe .o{background:var(--orange);} .stripe .r{background:var(--red);}
-  .inner{padding:16px 16px 40px; display:flex; flex-direction:column; gap:14px;}
+  .inner{flex:1; min-height:0; display:flex; flex-direction:column; gap:10px; padding:12px 14px 14px;}
 
-  header{display:flex; align-items:center; gap:12px;}
-  .emblem{width:52px; height:52px; border-radius:13px; overflow:hidden; flex:none;
-          box-shadow:0 2px 0 rgba(0,0,0,.07);}
+  header{flex:none; display:flex; align-items:center; gap:11px;}
+  .emblem{width:42px; height:42px; border-radius:11px; overflow:hidden; flex:none; box-shadow:0 2px 0 rgba(0,0,0,.07);}
   .emblem img{width:100%; height:100%; object-fit:cover; display:block;}
-  .htext{flex:1; line-height:1.2;}
-  .htext .t1{font-size:12.5px; color:var(--green); font-weight:700; letter-spacing:1.2px;}
-  .htext .t2{font-size:17px; font-weight:600; margin-top:2px;}
+  .htext{flex:1; line-height:1.15;}
+  .htext .t1{font-size:11px; color:var(--green); font-weight:700; letter-spacing:1px;}
+  .htext .t2{font-size:15px; font-weight:600; margin-top:1px;}
   #clock{font-family:var(--mono); font-size:14px; color:var(--muted); font-variant-numeric:tabular-nums;}
 
-  .cam{position:relative; aspect-ratio:1/1; border-radius:18px; overflow:hidden; background:#0c0f0d;
-       border:1px solid var(--line);}
+  .cam{flex:1; min-height:160px; position:relative; border-radius:16px; overflow:hidden;
+       background:#0c0f0d; border:1px solid var(--line);}
   video{width:100%; height:100%; object-fit:cover; transform:scaleX(-1);}
-  .ring{position:absolute; inset:0; border:3px solid transparent; border-radius:18px;
+  .ring{position:absolute; inset:0; border:3px solid transparent; border-radius:16px;
         transition:border-color .25s; pointer-events:none;}
   .ring.on{border-color:var(--green);}
   .facebadge{position:absolute; left:11px; bottom:11px; font-size:13px; padding:6px 12px;
         border-radius:999px; background:rgba(0,0,0,.55); backdrop-filter:blur(6px); color:#fff;
-        display:flex; align-items:center; gap:8px;}
+        display:flex; align-items:center; gap:8px; z-index:3;}
   .dot{width:8px; height:8px; border-radius:50%; background:#9aa19a;}
   .dot.on{background:#34d27e; box-shadow:0 0 0 4px rgba(52,210,126,.22);}
   .camnote{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-        text-align:center; padding:24px; color:#cfd3cc; font-size:14px;}
+        text-align:center; padding:24px; color:#cfd3cc; font-size:14px; z-index:2;}
+  .toast{position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+        text-align:center; padding:22px; z-index:6; white-space:pre-line; font-size:16px; line-height:1.55;
+        color:#fff; font-weight:500; cursor:pointer;}
+  .toast.show{display:flex;}
+  .toast.ok{background:rgba(0,112,60,.93);}
+  .toast.err{background:rgba(225,31,38,.93);}
 
-  .field label{display:block; font-size:12.5px; color:var(--muted); margin:0 0 7px 2px; letter-spacing:.3px; font-weight:500;}
+  .controls{flex:none; display:flex; flex-direction:column; gap:9px;}
+  .labelrow{display:flex; align-items:center; justify-content:space-between;}
+  .labelrow label{font-size:12.5px; color:var(--muted); font-weight:500; letter-spacing:.3px;}
   input[type=text]{width:100%; background:#fff; border:1.5px solid var(--line2); border-radius:13px;
-        padding:15px 15px; font:inherit; font-size:18px; color:var(--txt); letter-spacing:1px;
-        text-transform:uppercase;}
-  input[type=text]::placeholder{letter-spacing:.5px; text-transform:none; color:#aab0a9;}
+        padding:13px 15px; font:inherit; font-size:21px; font-weight:600; color:var(--txt);
+        letter-spacing:3px; text-align:center; font-variant-numeric:tabular-nums;}
+  input[type=text]::placeholder{letter-spacing:.5px; font-weight:400; color:#aab0a9;}
   input[type=text]:focus{outline:none; border-color:var(--green); box-shadow:0 0 0 3px var(--green-soft);}
-  .hint{font-size:13.5px; margin:8px 2px 0; min-height:18px; display:flex; align-items:center; gap:6px;}
+  .hint{font-size:13px; margin:5px 2px 0; min-height:16px; text-align:center;}
   .hint.ok{color:var(--green); font-weight:500;} .hint.bad{color:var(--red);} .hint.idle{color:var(--muted);}
 
-  .status{background:#fafbf9; border:1px solid var(--line); border-radius:16px; overflow:hidden;}
-  .srow{display:flex; align-items:center; justify-content:space-between; padding:13px 16px;}
-  .srow+.srow{border-top:1px solid var(--line);}
-  .slabel{font-size:14px; color:var(--muted);}
-  .sval{font-family:var(--mono); font-size:14px; font-variant-numeric:tabular-nums; color:var(--txt);}
-  .pill{font-family:'Anuphan'; font-size:12.5px; padding:5px 12px; border-radius:999px; font-weight:600;}
+  .statusbar{display:flex; align-items:center; justify-content:space-between; gap:10px;
+        background:#fafbf9; border:1px solid var(--line); border-radius:13px; padding:10px 14px;}
+  .sb-branch{font-size:14.5px; font-weight:600;}
+  .sb-dist{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:1px; font-variant-numeric:tabular-nums;}
+  .pill{font-size:12.5px; padding:6px 13px; border-radius:999px; font-weight:600; flex:none;}
   .pill.ok{background:var(--green-soft); color:var(--green-d);}
   .pill.bad{background:var(--red-soft); color:var(--red);}
   .pill.idle{background:#eef0ec; color:var(--muted);}
 
   .btns{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-  button.act{border:1.5px solid transparent; border-radius:15px; padding:17px 0; font:inherit;
+  button.act{border:1.5px solid transparent; border-radius:14px; padding:16px 0; font:inherit;
         font-size:17px; font-weight:600; cursor:pointer; transition:transform .08s, opacity .2s;}
   button.act:active{transform:scale(.98);}
   button.in{background:var(--green); color:#fff;}
   button.out{background:#fff; color:var(--green-d); border-color:var(--line2);}
   button.act:disabled{opacity:.4; cursor:not-allowed;}
-  .lockmsg{font-size:13px; color:var(--orange); text-align:center; min-height:18px; margin-top:-2px; font-weight:500;}
-
-  .toast{border-radius:14px; padding:15px 16px; font-size:15px; line-height:1.55; display:none; white-space:pre-line;}
-  .toast.show{display:block;}
-  .toast.ok{background:var(--green-soft); color:var(--green-d); border:1px solid #b9dcc7;}
-  .toast.err{background:var(--red-soft); color:#a3151b; border:1px solid #f1bcbe;}
-
-  .foot{text-align:center; margin-top:4px;}
-  .link{color:var(--muted); font-size:13px; text-decoration:underline; cursor:pointer; background:none; border:0; font-family:inherit;}
+  .lockmsg{font-size:12.5px; color:var(--orange); text-align:center; min-height:16px; font-weight:500;}
+  .link{color:var(--muted); font-size:12.5px; text-decoration:underline; cursor:pointer; background:none; border:0; font-family:inherit; padding:0;}
 
   .overlay{position:fixed; inset:0; background:rgba(20,24,21,.55); backdrop-filter:blur(3px);
         display:none; align-items:center; justify-content:center; padding:20px; z-index:9;}
@@ -117,30 +116,33 @@
       <div class="ring" id="ring"></div>
       <div class="facebadge"><span class="dot" id="facedot"></span><span id="facetext">กำลังเตรียมกล้อง…</span></div>
       <div class="camnote" id="camnote">แตะ "อนุญาต" เพื่อเปิดกล้อง</div>
+      <div class="toast" id="toast"></div>
     </div>
 
-    <div class="field">
-      <label>รหัสพนักงาน</label>
-      <input id="empId" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" placeholder="กรอกรหัส เช่น E001">
-      <div class="hint idle" id="empHint"></div>
+    <div class="controls">
+      <div>
+        <div class="labelrow">
+          <label>รหัสพนักงาน</label>
+          <button class="link" id="regBtn">ลงทะเบียนใบหน้า</button>
+        </div>
+        <input id="empId" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="กรอกรหัสตัวเลข">
+        <div class="hint idle" id="empHint"></div>
+      </div>
+
+      <div class="statusbar">
+        <div>
+          <div class="sb-branch" id="branchName">สาขา —</div>
+          <div class="sb-dist" id="distVal">— ม.</div>
+        </div>
+        <div class="pill idle" id="zonePill">รอสัญญาณ</div>
+      </div>
+
+      <div class="btns">
+        <button class="act in"  id="btnIn"  disabled>เข้างาน</button>
+        <button class="act out" id="btnOut" disabled>ออกงาน</button>
+      </div>
+      <div class="lockmsg" id="lockMsg"></div>
     </div>
-
-    <div class="status">
-      <div class="srow"><div class="slabel">สาขาที่ใกล้ที่สุด</div><div class="sval" id="branchName">—</div></div>
-      <div class="srow"><div class="slabel">ระยะห่าง</div><div class="sval" id="distVal">— ม.</div></div>
-      <div class="srow"><div class="slabel">ความแม่นยำ GPS</div><div class="sval" id="accVal">± — ม.</div></div>
-      <div class="srow"><div class="slabel">สถานะพื้นที่</div><div class="pill idle" id="zonePill">รอสัญญาณ</div></div>
-    </div>
-
-    <div class="btns">
-      <button class="act in"  id="btnIn"  disabled>เข้างาน</button>
-      <button class="act out" id="btnOut" disabled>ออกงาน</button>
-    </div>
-    <div class="lockmsg" id="lockMsg"></div>
-
-    <div class="toast" id="toast"></div>
-
-    <div class="foot"><button class="link" id="regBtn">ลงทะเบียนใบหน้า (ครั้งแรก)</button></div>
   </div>
 </div>
 
@@ -148,9 +150,8 @@
   <div class="sheet">
     <h2>ลงทะเบียนใบหน้า</h2>
     <p>หันหน้าตรงเข้ากล้องในที่ที่มีแสงพอ กรอกรหัสพนักงาน แล้วกดบันทึก ระบบจะเก็บค่าใบหน้าไว้เทียบตอนลงเวลา</p>
-    <div class="field">
-      <label>รหัสพนักงาน</label>
-      <input id="regId" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" placeholder="เช่น E001">
+    <div>
+      <input id="regId" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="รหัสพนักงาน">
       <div class="hint idle" id="regHint"></div>
     </div>
     <button class="act in" id="regSave">บันทึกใบหน้า</button>
@@ -167,15 +168,12 @@ const MODEL_URL  = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
 
 let CFG = { branches:[], shifts:[], employees:[], threshold:0.5 };
 let gps = { lat:null, lng:null, accuracy:null, branch:null, distance:null, within:false };
-let empMatch = null;            // พนักงานที่ตรงกับรหัสที่กรอกในหน้าหลัก
+let empMatch = null, regMatch = null;
 let modelsReady = false, faceDetected = false, busy = false;
 
 const $ = id => document.getElementById(id);
-
-// ====== นาฬิกา ======
 setInterval(() => { $('clock').textContent = new Date().toLocaleTimeString('th-TH',{hour12:false}); }, 1000);
 
-// ====== เริ่มต้น ======
 init();
 async function init(){
   await loadConfig();
@@ -189,18 +187,23 @@ async function loadConfig(){
   try{
     const r = await fetch(SCRIPT_URL + '?action=config');
     CFG = await r.json();
-  }catch(e){ showToast('err','โหลดข้อมูลระบบไม่สำเร็จ ตรวจ SCRIPT_URL'); }
+  }catch(e){ showToast('err','โหลดข้อมูลระบบไม่สำเร็จ\nตรวจ SCRIPT_URL'); }
 }
 
-// ค้นหาพนักงานจากรหัส (ไม่สนตัวพิมพ์เล็กใหญ่) ส่งกลับ object หรือ null
+// ค้นหาพนักงานจากรหัส: ตรงตัว หรือเท่ากันเชิงตัวเลข (001 = 1)
 function lookupEmp(v){
   v = (v||'').trim();
   if(!v) return null;
   const list = CFG.employees || [];
-  if(!list.length) return { emp_id:v, name:null, unknown:true };   // เผื่อโหลด config ไม่ได้
-  return list.find(e => String(e.emp_id).toUpperCase() === v.toUpperCase()) || null;
+  if(!list.length) return { emp_id:v, name:null, unknown:true };
+  const vNum = Number(v);
+  return list.find(e=>{
+    const id = String(e.emp_id);
+    if(id.toUpperCase() === v.toUpperCase()) return true;
+    if(!isNaN(vNum) && id !== '' && !isNaN(Number(id)) && Number(id) === vNum) return true;
+    return false;
+  }) || null;
 }
-
 function renderHint(hintEl, match, raw){
   if(!raw){ hintEl.className='hint idle'; hintEl.textContent=''; return; }
   if(!match){ hintEl.className='hint bad'; hintEl.textContent='ไม่พบรหัสนี้'; return; }
@@ -229,7 +232,7 @@ async function loadModels(){
     $('facetext').textContent = 'ค้นหาใบหน้า…';
   }catch(e){
     $('facetext').textContent = 'โหลดโมเดลไม่สำเร็จ';
-    showToast('err','โหลดโมเดลใบหน้าไม่สำเร็จ ลองสลับ MODEL_URL อีกตัวในโค้ด');
+    showToast('err','โหลดโมเดลใบหน้าไม่สำเร็จ\nลองสลับ MODEL_URL อีกตัวในโค้ด');
   }
 }
 
@@ -252,7 +255,6 @@ function evaluateZone(){
   if(best){ const bonus=Math.min(gps.accuracy||0,50); gps.within=bestD<=best.radius_m+bonus; }
   else gps.within=false;
 }
-
 function haversine(lat1,lng1,lat2,lng2){
   const R=6371000, toRad=x=>x*Math.PI/180;
   const dLat=toRad(lat2-lat1), dLng=toRad(lng2-lng1);
@@ -262,10 +264,8 @@ function haversine(lat1,lng1,lat2,lng2){
 
 async function detectLoop(){
   if(modelsReady){
-    try{
-      const det = await faceapi.detectSingleFace($('video'), new faceapi.TinyFaceDetectorOptions());
-      faceDetected = !!det;
-    }catch(e){ faceDetected=false; }
+    try{ faceDetected = !!(await faceapi.detectSingleFace($('video'), new faceapi.TinyFaceDetectorOptions())); }
+    catch(e){ faceDetected=false; }
   }
   updateUI();
   setTimeout(detectLoop, 700);
@@ -276,25 +276,25 @@ function updateUI(){
   $('facedot').className = 'dot ' + (faceDetected?'on':'');
   if(modelsReady) $('facetext').textContent = faceDetected ? 'พบใบหน้า' : 'ไม่พบใบหน้า';
 
-  $('branchName').textContent = gps.branch ? gps.branch.name : '—';
-  $('distVal').textContent = gps.distance!=null ? Math.round(gps.distance)+' ม.' : '— ม.';
-  $('accVal').textContent  = gps.accuracy!=null ? '± '+Math.round(gps.accuracy)+' ม.' : '± — ม.';
+  $('branchName').textContent = gps.branch ? gps.branch.name : 'สาขา —';
+  let dtxt = gps.distance!=null ? Math.round(gps.distance)+' ม.' : '— ม.';
+  if(gps.accuracy!=null) dtxt += ' · ±'+Math.round(gps.accuracy)+' ม.';
+  $('distVal').textContent = dtxt;
   const zp=$('zonePill');
   if(gps.distance==null){ zp.className='pill idle'; zp.textContent='รอสัญญาณ'; }
   else if(gps.within){ zp.className='pill ok'; zp.textContent='อยู่ในพื้นที่'; }
   else { zp.className='pill bad'; zp.textContent='นอกพื้นที่'; }
 
   const reasons=[];
-  if(!empMatch) reasons.push('กรอกรหัสพนักงานให้ถูกต้อง');
+  if(!empMatch) reasons.push('กรอกรหัส');
   if(!modelsReady) reasons.push('รอโหลดโมเดล');
-  if(!faceDetected) reasons.push('ให้กล้องเห็นใบหน้า');
-  if(!gps.within) reasons.push('เข้าใกล้พื้นที่ทำงาน');
+  if(!faceDetected) reasons.push('ให้เห็นใบหน้า');
+  if(!gps.within) reasons.push('เข้าใกล้พื้นที่');
   const ready = reasons.length===0 && !busy;
   $('btnIn').disabled=!ready; $('btnOut').disabled=!ready;
   $('lockMsg').textContent = busy ? '' : (reasons.length ? 'ต้อง: '+reasons.join(' · ') : '');
 }
 
-// ====== จับภาพ + ส่ง ======
 async function getDescriptor(){
   const det = await faceapi.detectSingleFace($('video'), new faceapi.TinyFaceDetectorOptions())
     .withFaceLandmarks().withFaceDescriptor();
@@ -317,7 +317,7 @@ async function submit(action){
   setBtnBusy(true);
   try{
     const descriptor = await getDescriptor();
-    if(!descriptor){ showToast('err','ไม่พบใบหน้าชัดเจน ลองใหม่'); return; }
+    if(!descriptor){ showToast('err','ไม่พบใบหน้าชัดเจน\nลองใหม่'); return; }
     const data = await post({
       action, emp_id:empMatch.emp_id, descriptor,
       lat:gps.lat, lng:gps.lng, accuracy:gps.accuracy,
@@ -334,7 +334,7 @@ async function submit(action){
       }
       showToast('ok', m);
     } else showToast('err', data.error||'เกิดข้อผิดพลาด');
-  }catch(e){ showToast('err','ส่งข้อมูลไม่สำเร็จ ตรวจการเชื่อมต่อ'); }
+  }catch(e){ showToast('err','ส่งข้อมูลไม่สำเร็จ\nตรวจการเชื่อมต่อ'); }
   finally{ busy=false; setBtnBusy(false); updateUI(); }
 }
 function setBtnBusy(on){
@@ -343,25 +343,26 @@ function setBtnBusy(on){
 }
 function showToast(kind,msg){
   const t=$('toast'); t.className='toast show '+kind; t.textContent=msg;
-  if(kind==='ok') setTimeout(()=>t.classList.remove('show'), 8000);
+  if(kind==='ok') setTimeout(()=>t.classList.remove('show'), 6000);
 }
+$('toast').onclick = ()=>$('toast').classList.remove('show');
 
 // ====== events ======
 $('empId').addEventListener('input', e=>{
+  e.target.value = e.target.value.replace(/\D/g,'');
   empMatch = lookupEmp(e.target.value);
-  renderHint($('empHint'), empMatch, e.target.value.trim());
+  renderHint($('empHint'), empMatch, e.target.value);
   updateUI();
 });
 $('btnIn').onclick  = ()=>submit('checkin');
 $('btnOut').onclick = ()=>submit('checkout');
 
-// ====== ลงทะเบียนใบหน้า ======
-let regMatch = null;
 $('regBtn').onclick   = ()=>$('regOverlay').classList.add('show');
 $('regClose').onclick = ()=>$('regOverlay').classList.remove('show');
 $('regId').addEventListener('input', e=>{
+  e.target.value = e.target.value.replace(/\D/g,'');
   regMatch = lookupEmp(e.target.value);
-  renderHint($('regHint'), regMatch, e.target.value.trim());
+  renderHint($('regHint'), regMatch, e.target.value);
 });
 $('regSave').onclick = async ()=>{
   if(!regMatch){ showToast('err','กรอกรหัสพนักงานให้ถูกต้องก่อน'); return; }
