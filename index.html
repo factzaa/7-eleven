@@ -330,7 +330,6 @@ async function submit(action){
         if(data.late_min>0) m+='\n⚠️ สาย '+data.late_min+' นาที';
       } else {
         m='👋 บันทึกออกงานแล้ว\n'+data.emp_name+' · '+data.time;
-        if(data.ot_hours>0) m+='\nOT '+data.ot_hours+' ชม.';
       }
       showToast('ok', m);
     } else showToast('err', data.error||'เกิดข้อผิดพลาด');
